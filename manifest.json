@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+
+  "name": "Nuke Reddit History",
+  "description": "This extension overwrites and deletes all your comments in reddit",
+  "version": "1.0",
+
+//  "browser_action": {
+//    "default_icon": "icon.png",
+//    "default_popup": "popup.html"
+//  },
+  "permissions": [
+    "activeTab",
+    "https://reddit.com/user/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.reddit.com/user/*/comments*", "https://www.reddit.com/user/*/submitted*"],
+      "js": ["third_party/lodash.js", "add_delete_buttons_content_script.js"]
+    }
+  ],
+  "content_security_policy":"script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'"
+}
+
