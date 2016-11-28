@@ -13,6 +13,6 @@ Project name is not final.
 - Adds a button that initiates the task of overwriting and deleting reddit user comments
 
 ###How does it work?
-- Keeps scrolling downwards to load all comments by *loggedInUser*. This is where res's scroll to load more comments feature is used.
+- Once activated, the extension keeps scrolling downwards to load all comments by *loggedInUser*. This is where res's scroll to load more comments feature is used.
 - After detecting all comments have been loaded, the script performs overwrites every X seconds.
-- Yet to implement-> Delete all comments.
+- The extensions then scrolls to the top of the page and starts deleting comments every X seconds.
