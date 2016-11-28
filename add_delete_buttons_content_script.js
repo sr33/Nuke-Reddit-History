@@ -8,9 +8,9 @@ startDeleteCommentsButton.innerText = "Delete All My Comments";
 var waitTimeInputElement = document.createElement("input");
 waitTimeInputElement.id = "waitTimeUserInput";
 waitTimeInputElement.type = "number";
+waitTimeInputElement.defaultValue = 2;
 waitTimeInputElement.min = 2;
 waitTimeInputElement.max = 8;
-waitTimeInputElement.value = "2";
 
 var waitTimelabel = document.createElement("small");
 waitTimelabel.innerHTML = "seconds to wait between per comment edit & delete";
@@ -19,7 +19,7 @@ var karmaElement = document.getElementsByClassName("titlebox")[0];
 karmaElement.insertAdjacentHTML('afterEnd', extensionElementsDiv.outerHTML);
 
 extensionElementsDiv = document.getElementById("nuke-reddit-history-div");
-extensionElementsDiv.innerHTML += waitTimeInputElement.outerHTML;
+extensionElementsDiv.innerHTML += waitTimeInputElement.outerHTML + "&nbsp;";
 extensionElementsDiv.innerHTML += waitTimelabel.outerHTML;
 extensionElementsDiv.innerHTML += startDeleteCommentsButton.outerHTML;
 
@@ -30,7 +30,7 @@ var redditCommentEditButtons = undefined;
 var currentEditCommentIndex = 0;
 var editCommentInterval = undefined;
 
-var redditCommentDeleteButtons = undefined;
+var redditCommentDeleteForms = undefined;
 var currentDeleteCommentIndex = 0;
 var deleteCommentInterval = undefined;
 
@@ -94,19 +94,21 @@ function overwriteComment(commentEdit) {
 
 //delete comments
 function startDeletingComments() {
-    redditCommentDeleteButtons = getRedditCommentDeleteButtons();
-    console.log("total comments deletions: ", redditCommentDeleteButtons.length);
+    window.scrollTo(0, 0);
+    _.forEach( getRedditCommentDeleteButtons(), function (deleteButton) {
+        deleteButton.click();
+    });
+    redditCommentDeleteForms = document.getElementsByClassName("toggle del-button");
     deleteCommentInterval = setInterval(deleteComment, waitTimeSeconds * 1000);
 }
 
 function deleteComment() {
-    if (currentDeleteCommentIndex === redditCommentDeleteButtons.length) {
+    if (currentDeleteCommentIndex === redditCommentDeleteForms.length) {
         clearInterval(deleteCommentInterval);
-        console.log("finished deleting comments. GOTO NEXT PAGE");
     }
     else {
-        var deleteButton = redditCommentDeleteButtons[currentDeleteCommentIndex];
-        deleteButton.click();
+        var commentDeleteConfirmation = redditCommentDeleteForms[currentDeleteCommentIndex].getElementsByClassName("yes")[0];
+        if (commentDeleteConfirmation) commentDeleteConfirmation.click();
         currentDeleteCommentIndex++;
     }
 }
