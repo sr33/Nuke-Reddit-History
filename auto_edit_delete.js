@@ -35,9 +35,9 @@ var currentDeleteCommentIndex = 0;
 var deleteCommentInterval = undefined;
 
 document.getElementById("startDeleteCommentsButton").addEventListener('click', function () {
-    var deleteMessage = "***Nuke Reddit History***\n" +
-        "Clicking 'OK' will overwrite all your redditCommentEditButtons and delete them!\n" +
-        "Are you absolutely sure?\n" +
+    var deleteMessage = "Nuke Reddit History\n\n" +
+        "Clicking 'OK' will overwrite all your comments and delete them!\n" +
+        "Are you absolutely sure?\n\n" +
         "DO NOT CLOSE THIS TAB UNTIL ALL COMMENTS ARE DELETED!";
 
     if (confirm(deleteMessage)) {
@@ -73,7 +73,7 @@ function startEditingComments() {
 
 function overwriteAndDeleteComment() {
     if (currentEditCommentIndex === redditCommentEditButtons.length) {
-        console.log("finished Editing.");
+        console.log("finished editing.");
         clearInterval(editCommentInterval);
         startDeletingComments();
     }
