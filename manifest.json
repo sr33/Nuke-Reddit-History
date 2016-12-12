@@ -18,7 +18,11 @@
   "content_scripts": [
     {
       "matches": ["https://www.reddit.com/user/*/comments/", "https://www.reddit.com/user/*/comments"],
-      "js": ["third_party/lodash.js", "auto_edit_delete.js"]
+      "js": ["third_party/lodash.js", "content_scripts/auto_edit_delete.js"]
+    },
+    {
+      "matches": ["https://www.reddit.com/user/*/submitted/", "https://www.reddit.com/user/*/submitted"],
+      "js": ["third_party/lodash.js", "content_scripts/shared_dom_interactions.js", "content_scripts/posts_auto_delete.js"]
     }
   ]
 }
