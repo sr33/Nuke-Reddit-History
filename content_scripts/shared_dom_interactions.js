@@ -9,7 +9,7 @@ function scrollTillEntireUserDataIsLoaded(intervalTimeInSec, callback) {
             window.scrollTo(0, 0);
             callback();
         }
-        window.scrollTo(0, document.body.scrollHeight);
+        scrollToTopOfPage();
     }, intervalTimeInSec * 1000);
 
 }
@@ -40,4 +40,8 @@ function getDeleteButtonsOnPage() {
     return _.filter(document.getElementsByClassName("togglebutton"), function (toggleButton) {
         return toggleButton.getAttribute("data-event-action") === "delete"
     });
+}
+
+function scrollToTopOfPage(){
+    window.scrollTo(0, document.body.scrollHeight);
 }

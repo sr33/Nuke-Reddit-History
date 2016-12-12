@@ -23,16 +23,10 @@ extensionElementsDiv.innerHTML += waitTimeInputElement.outerHTML + "&nbsp;";
 extensionElementsDiv.innerHTML += waitTimelabel.outerHTML;
 extensionElementsDiv.innerHTML += startDeleteCommentsButton.outerHTML;
 
-var scrollInterval = undefined;
-
 var waitTimeSeconds = 2;
 var redditCommentEditButtons = undefined;
 var currentEditCommentIndex = 0;
 var editCommentInterval = undefined;
-
-var redditCommentDeleteForms = undefined;
-var currentDeleteCommentIndex = 0;
-var deleteCommentInterval = undefined;
 
 document.getElementById("startDeleteCommentsButton").addEventListener('click', function () {
     var deleteMessage = "Nuke Reddit History\n\n" +
@@ -42,7 +36,7 @@ document.getElementById("startDeleteCommentsButton").addEventListener('click', f
 
     if (confirm(deleteMessage)) {
         safelySetWaitTime();
-        scrollInterval = setInterval(scrollToEndOfPageToGetAllComments, 4000);
+        scrollTillEntireUserDataIsLoaded(4, startEditingComments);
     }
 
 });
@@ -52,16 +46,6 @@ function safelySetWaitTime() {
     if (!isNaN(waitTimeUserInput) && waitTimeUserInput >= 2) {
         waitTimeSeconds = waitTimeUserInput;
     }
-}
-
-//keep scrolling to EndOfPage
-function scrollToEndOfPageToGetAllComments() {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        clearInterval(scrollInterval);
-        console.log("cleared scroll interval");
-        startEditingComments();
-    }
-    window.scrollTo(0, document.body.scrollHeight);
 }
 
 //edit Comments
@@ -75,7 +59,8 @@ function overwriteAndDeleteComment() {
     if (currentEditCommentIndex === redditCommentEditButtons.length) {
         console.log("finished editing.");
         clearInterval(editCommentInterval);
-        startDeletingComments();
+        scrollToTopOfPage();
+        deleteUserHistory(waitTimeSeconds, onDeletionComplete)
     }
     else {
         var currentCommentEdit = redditCommentEditButtons[currentEditCommentIndex];
@@ -92,33 +77,11 @@ function overwriteComment(commentEdit) {
     editTextBox.innerText = generateRandomSentence();
 }
 
-//delete comments
-function startDeletingComments() {
-    window.scrollTo(0, 0);
-    _.forEach( getRedditCommentDeleteButtons(), function (deleteButton) {
-        deleteButton.click();
-    });
-    redditCommentDeleteForms = document.getElementsByClassName("toggle del-button");
-    deleteCommentInterval = setInterval(deleteComment, waitTimeSeconds * 1000);
-}
-
-function deleteComment() {
-    if (currentDeleteCommentIndex === redditCommentDeleteForms.length) {
-        clearInterval(deleteCommentInterval);
-    }
-    else {
-        var commentDeleteConfirmation = redditCommentDeleteForms[currentDeleteCommentIndex].getElementsByClassName("yes")[0];
-        if (commentDeleteConfirmation) commentDeleteConfirmation.click();
-        currentDeleteCommentIndex++;
-    }
-}
-
-function getRedditCommentDeleteButtons() {
-    return _.filter(document.getElementsByClassName("togglebutton"), function (toggleButton) {
-        return toggleButton.getAttribute("data-event-action") === "delete"
-    });
-}
 //other helper methods
+
+function onDeletionComplete(){
+    alert("All user comments were overwritten and deleted. Thank you for using the extension.")
+}
 
 function generateRandomSentence() {
     //thanks to http://stackoverflow.com/a/4709034
