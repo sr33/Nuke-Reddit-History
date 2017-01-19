@@ -1,34 +1,11 @@
-var extensionElementsDiv = document.createElement("div");
-extensionElementsDiv.id = "nuke-reddit-history-div";
-
-var startDeleteCommentsButton = document.createElement("button");
-startDeleteCommentsButton.id = "startDeleteCommentsButton";
-startDeleteCommentsButton.innerText = "Delete All My Comments";
-
-var waitTimeInputElement = document.createElement("input");
-waitTimeInputElement.id = "waitTimeUserInput";
-waitTimeInputElement.type = "number";
-waitTimeInputElement.defaultValue = 2;
-waitTimeInputElement.min = 2;
-waitTimeInputElement.max = 8;
-
-var waitTimelabel = document.createElement("small");
-waitTimelabel.innerHTML = "seconds to wait between per comment edit & delete";
-
-var karmaElement = document.getElementsByClassName("titlebox")[0];
-karmaElement.insertAdjacentHTML('afterEnd', extensionElementsDiv.outerHTML);
-
-extensionElementsDiv = document.getElementById("nuke-reddit-history-div");
-extensionElementsDiv.innerHTML += waitTimeInputElement.outerHTML + "&nbsp;";
-extensionElementsDiv.innerHTML += waitTimelabel.outerHTML;
-extensionElementsDiv.innerHTML += startDeleteCommentsButton.outerHTML;
+buildAndApplyBasicUI("seconds to wait between per comment edit & delete", "Delete all my comments");
 
 var waitTimeSeconds = 2;
 var redditCommentEditButtons = undefined;
 var currentEditCommentIndex = 0;
 var editCommentInterval = undefined;
 
-document.getElementById("startDeleteCommentsButton").addEventListener('click', function () {
+document.getElementById("startDeleteButton").addEventListener('click', function () {
     var deleteMessage = "Nuke Reddit History\n\n" +
         "Clicking 'OK' will overwrite all your comments and delete them!\n" +
         "Are you absolutely sure?\n\n" +
@@ -36,7 +13,7 @@ document.getElementById("startDeleteCommentsButton").addEventListener('click', f
 
     if (confirm(deleteMessage)) {
         safelySetWaitTime();
-        scrollTillEntireUserDataIsLoaded(4, startEditingComments);
+        scrollTillEntireUserDataIsLoaded(waitTimeSeconds + 2, startEditingComments);
     }
 
 });
