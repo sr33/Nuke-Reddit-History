@@ -2,27 +2,27 @@
   "manifest_version": 2,
 
   "name": "Nuke Reddit History",
-  "description": "This extension overwrites and deletes all your comments in reddit",
-  "version": "0.0.0.2",
+  "description": "To overwrite & delete all your comments on reddit, click this extension's icon next to your address bar.",
+  "version": "0.81",
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
     "128": "images/icon128.png"
   },
 
-  "browser_action": {"default_icon": "images/icon16.png"},
+  "browser_action": {
+    "default_icon": "images/icon16.png",
+    "default_popup": "popup.html"
+
+  },
   "permissions": [
     "activeTab",
-    "https://reddit.com/user/*"
+    "https://reddit.com/user/*/comments/*"
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.reddit.com/user/*/comments*"],
-      "js": ["third_party/lodash.js", "content_scripts/shared/shared_ui.js", "content_scripts/shared/shared_dom_interactions.js", "content_scripts/comment_overwrite_delete.js"]
-    },
-    {
-      "matches": ["https://www.reddit.com/user/*/submitted*"],
-      "js": ["third_party/lodash.js", "content_scripts/shared/shared_ui.js", "content_scripts/shared/shared_dom_interactions.js", "content_scripts/posts_auto_delete.js"]
+      "matches": ["https://www.reddit.com/user/*/comments/*"],
+      "js": ["content_scripts/shared/utils.js", "content_scripts/shared/reddit_objects.js", "content_scripts/shared/shared_ui.js", "content_scripts/comment_overwrite_delete.js"]
     }
   ]
 }
