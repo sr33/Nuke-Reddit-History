@@ -57,10 +57,43 @@ function getFirstElementWithTextInside(text, htmlElements) {
     if (htmlElements) {
         for (var el in htmlElements) {
             var htmlElement = htmlElements[el];
-            if (htmlElement.innerText && htmlElement.innerText.includes(text)) {
+            if (htmlElement.innerText && htmlElement.innerText === text) {
                 return htmlElement;
             }
         }
     }
     return false;
 }
+
+/**
+ * @function: getParameterByName - returns GET param value from current url if no url is provided
+ * **/
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+
+/**
+ * @function: replaceParameter - replaces url GET param value with value provided.
+ * if url is not provided, current url is considered.
+ * **/
+function replaceParameter(paramName, paramValue, url) {
+    if (!url) url = window.location.href;
+    if (paramValue === null) {
+        paramValue = '';
+    }
+    var pattern = new RegExp('\\b(' + paramName + '=).*?(&|$)');
+    if (url.search(pattern) >= 0) {
+        return url.replace(pattern, '$1' + paramValue + '$2');
+    }
+    url = url.replace(/\?$/, '');
+    return url + (url.indexOf('?') > 0 ? '&' : '?') + paramName + '=' + paramValue;
+}
+

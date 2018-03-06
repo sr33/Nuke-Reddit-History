@@ -1,31 +1,48 @@
 
-
 if (getParameterByName('efe2d409a42') === 'f9ce4f81e6326') {
-    console.log("script loaded at ", new Date());
-    setTimeout(init, 2000);
+    init();
 }
 
 
 function init() {
-    console.log("started scanning at ", new Date());
     var userPage = new UserPage();
+    userPage.addHtmlSticky("template.html");
+
+    var statsApp = new Vue({
+        el: '#statsDiv',
+        data: {
+            userPage: userPage
+        },
+        methods: {
+            onFeedbackClick: function () {
+                window.open("https://www.reddit.com/r/nukereddithistory/submit?title=Error%20Help:%20Log%20Provided&text=" + encodeURI(userPage.actionsLog), "_blank")
+            }
+        }
+    });
+
     userPage.scanComments();
-    console.log("# of comments found", userPage.comments.length);
+    userPage.addToActionsLog("number of comments found- " + userPage.comments.length + " at- " + (new Date()).toString());
     if (userPage.comments.length > 0) {
+        userPage.addToActionsLog("Started Editing Comments");
         userPage.overWriteAndDeleteComments();
     }
     else {
-        alert("No comments found!");
+        userPage.addToActionsLog("No Comments Found at " + (new Date()).toString());
+        userPage.addToActionsLog("Current Sort set at: " + getParameterByName('sort'));
+
+        if (userPage.sort === undefined || userPage.sort === '' || userPage.sort === null){
+            window.location.href = window.location.href + "&sort=hot";
+        }
+        else if (userPage.sort === "hot") {
+            window.location.href = replaceParameter('sort', 'top')
+        }
+        else if (userPage.sort === "top") {
+            window.location.href = replaceParameter('sort', 'controversial');
+        }
+        else {
+            alert("Nuke Reddit History Extension tried it's best to overwrite & delete all comments on your profile.\n\n\n" +
+                "Nuke Reddit History cannot find any more comments on your profile. \n\nIf you think this was done in error, please use the \n \"Issues? Submit Feedback\" button\n to report errors");
+        }
+
     }
-}
-
-
-function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }

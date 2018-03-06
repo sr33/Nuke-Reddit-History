@@ -1,4 +1,4 @@
-var EDIT_BUTTON_TEXT = "comment edit";
+var EDIT_BUTTON_TEXT = "edit";
 var DELETE_BUTTON_TEXT = 'delete';
 
 /**
@@ -28,7 +28,7 @@ Comment.prototype.deleteComment = function () {
             deleteConfirmation.click();
         }
         else {
-            console.log("No delete confirmation")
+            console.log("No delete confirmation for comment: ", self.articleId)
         }
     }
 };
@@ -48,10 +48,24 @@ function UserPage() {
     this.requestsStartTime = undefined;
     this.requestsEndTime = undefined;
     this.numberOfRequestsMade = 0;
+    this.numberOfEditedComments = 0;
+    this.numberOfDeletedComments = 0;
+    this.progress = "0%";
+    this.actionsLog = "App Entry: " + (new Date()).toString();
+    this.sort = getParameterByName('sort');
 }
+
+UserPage.prototype.addToActionsLog = function (text) {
+  this.actionsLog += "\n" + text;
+};
+
 
 UserPage.prototype.secondsSpentOnRequests = function () {
     return parseInt((this.requestsEndTime - this.requestsStartTime) / 1000);
+};
+
+UserPage.prototype.calculateProgress = function () {
+  this.progress = (((this.numberOfEditedComments + this.numberOfDeletedComments) / (this.comments.length * 2)) * 100) + "%";
 };
 
 UserPage.prototype.scanComments = function () {
@@ -85,11 +99,14 @@ UserPage.prototype.overWriteAndDeleteComments = function () {
         setTimeout(function () {
             self.comments[overWriteIndex].overWrite();
             self.numberOfRequestsMade++;
+            self.numberOfEditedComments++;
+            self.calculateProgress();
             overWriteIndex++;
             if (overWriteIndex < self.comments.length){
                 overWriteLoopWithDelay(milliSeconds);
             }
             else {
+                self.addToActionsLog("All Comments have been Edited at " + (new Date()).toString());
                 deleteLoopWithDelay(milliSeconds);
             }
         }, milliSeconds);
@@ -107,23 +124,45 @@ UserPage.prototype.overWriteAndDeleteComments = function () {
             self.comments[deleteIndex].deleteComment();
             self.numberOfRequestsMade++;
             deleteIndex++;
+            self.numberOfDeletedComments++;
+            self.calculateProgress();
             if (deleteIndex < self.comments.length){
                 deleteLoopWithDelay(milliseconds);
             }
             else {
                 self.requestsEndTime = new Date();
-                console.log("All comments on this page have been overwritten and deleted");
-                console.log("Stats unique to this page");
-                console.log("Requests began at: " + self.requestsStartTime);
-                console.log("Requests ended at: " + self.requestsStartTime);
-                console.log("Total Seconds spent: " + self.secondsSpentOnRequests());
-                console.log("Total Requests made: ", self.numberOfRequestsMade);
+                self.addToActionsLog("All comments on this page have been overwritten and deleted");
+                self.addToActionsLog("Stats unique to this page");
+                self.addToActionsLog("Requests began at- " + self.requestsStartTime);
+                self.addToActionsLog("Requests ended at- " + self.requestsStartTime);
+                self.addToActionsLog("Total Seconds spent- " + self.secondsSpentOnRequests());
+                self.addToActionsLog("Total Requests made- " + self.numberOfRequestsMade);
                 setTimeout(function () {
                     location.reload();
                 }, milliseconds + 2000);
             }
         }, milliseconds);
     }
+};
+
+
+UserPage.prototype.addHtmlSticky = function (pathToHtmlTemplate) {
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", chrome.extension.getURL(pathToHtmlTemplate), false);
+    xmlHttp.send(null);
+
+    var inject = document.createElement("div");
+    inject.style.position = "-webkit-sticky";
+    inject.style.position = "sticky";
+    // You must specify a threshold with at least one of top, right, bottom, or left for sticky for it to work - MDN
+    inject.style.top = "0";
+    inject.innerHTML = xmlHttp.responseText;
+    var profileSideBar = document.getElementsByClassName("ProfileTemplate__sidebar")[0];
+    while (profileSideBar.firstChild) {
+        profileSideBar.removeChild(profileSideBar.firstChild);
+    }
+    profileSideBar.appendChild(inject);
 };
 
 
