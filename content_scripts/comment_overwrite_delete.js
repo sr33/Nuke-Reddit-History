@@ -1,8 +1,16 @@
+/*
+ * Problem: The extension failed silently when user's profile is incompatible with the extension.
+ * Solution: The following function is run before init() to check if user profile is compatible. If it isn't an alert is displayed. If it is init()
+ */
 
-if (getParameterByName('efe2d409a42') === 'f9ce4f81e6326') {
-    init();
+var isUserProfileCompatible = function () {
+    return document.getElementsByClassName("ProfileTemplate__sidebar")[0]
 }
 
+if (getParameterByName('efe2d409a42') === 'f9ce4f81e6326') {
+    if (isUserProfileCompatible()) init();
+    else alert('This format of user profile page is incompatible with Nuke Reddit History.\n Please refer to the easy 2 step instruction on the extension description to switch to a compatible format. Thank you and Sorry for the inconvenience.')
+}
 
 function init() {
     var userPage = new UserPage();
