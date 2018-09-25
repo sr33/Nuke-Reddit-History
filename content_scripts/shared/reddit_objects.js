@@ -1,6 +1,9 @@
 var EDIT_BUTTON_TEXT = "edit";
 var DELETE_BUTTON_TEXT = 'delete';
 
+var PAGE_TYPE_COMMENTS = 'comments';
+var PAGE_TYPE_POSTS = 'posts'
+
 /**
  * @param: htmlElement - html element of the comment
  * @param: articleId - unique ID of the comment.
@@ -42,8 +45,21 @@ Comment.prototype.overWrite = function () {
     this.isEdited = true;
 };
 
+function Post(htmlElement){
+    this.deleteButton = this.findAnchorWithTextInside(DELETE_BUTTON_TEXT);
+}
+
+/**
+ *  @param: isUserProfileCompatible: boolean - is user profile is compatible with this extension?
+ *  @param: pageType: string - this is either a comments page or a posts page
+ *  @param: nextButton: htmlElement - next button element to go to next page
+ */
 function UserPage() {
+    this.isUserProfileCompatible = document.getElementsByClassName("ProfileTemplate__sidebar")[0];
     this.comments = [];
+    this.posts = [];
+
+    this.pageType = document.URL.includes('posts')? PAGE_TYPE_POSTS: PAGE_TYPE_COMMENTS;
     this.nextButton = getFirstElementWithTextInside("next", document.getElementsByClassName('ListingPagination__navButton'));
     this.requestsStartTime = undefined;
     this.requestsEndTime = undefined;
@@ -51,7 +67,7 @@ function UserPage() {
     this.numberOfEditedComments = 0;
     this.numberOfDeletedComments = 0;
     this.progress = "0%";
-    this.actionsLog = "App Entry: " + (new Date()).toString();
+    this.actionsLog = "App Entry: " + (new Date()).toString() + '\n';
     this.sort = getParameterByName('sort');
 }
 
@@ -77,6 +93,15 @@ UserPage.prototype.scanComments = function () {
         self.comments.push(comment);
     });
 };
+
+UserPage.prototype.scanPosts = function () {
+    var postHtmlElements = document.getElementsByClassName('Post__info');
+    postHtmlElements.forEach(function (postHtmlElement) {
+        console.log('--------\n\n');
+        
+        console.log(postHtmlElement);
+    });
+}
 
 UserPage.prototype.overWriteAndDeleteComments = function () {
     /**

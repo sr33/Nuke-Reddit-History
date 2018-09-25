@@ -1,19 +1,26 @@
-/*
- * Problem: The extension failed silently when user's profile is incompatible with the extension.
- * Solution: The following function is run before init() to check if user profile is compatible. If it isn't an alert is displayed. If it is init()
- */
+var userPage = new UserPage();
 
-var isUserProfileCompatible = function () {
-    return document.getElementsByClassName("ProfileTemplate__sidebar")[0]
-}
+// Check User Profile Compatibility before init
+if (userPage.isUserProfileCompatible()) init();
+else alert('This format of user profile page is incompatible with Nuke Reddit History.\n Please refer to the easy 2 step instruction on the extension description to switch to a compatible format. Thank you and Sorry for the inconvenience.')
 
-if (getParameterByName('efe2d409a42') === 'f9ce4f81e6326') {
-    if (isUserProfileCompatible()) init();
-    else alert('This format of user profile page is incompatible with Nuke Reddit History.\n Please refer to the easy 2 step instruction on the extension description to switch to a compatible format. Thank you and Sorry for the inconvenience.')
-}
 
 function init() {
-    var userPage = new UserPage();
+    if (document.URL.includes('posts')) {
+        console.log('init successful in posts');
+        deletePosts();
+    }
+    else if (document.URL.includes('comments')) {
+        overwriteAndDeleteComments();
+    }
+    
+}
+
+function deletePosts(){
+    userPage.scanPosts();
+}
+
+function overwriteAndDeleteComments() {
     userPage.addHtmlSticky("template.html");
 
     var statsApp = new Vue({
