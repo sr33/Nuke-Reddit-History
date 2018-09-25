@@ -17,11 +17,12 @@
   },
   "permissions": [
     "activeTab",
-    "https://reddit.com/user/*/comments/*"
+    "https://reddit.com/user/*/comments/*/?efe2d409a42=f9ce4f81e6326",
+    "https://reddit.com/user/*/posts/*/?efe2d409a42=f9ce4f81e6326"
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.reddit.com/user/*/comments/*"],
+      "matches": ["https://www.reddit.com/user/*/comments/*/?efe2d409a42=f9ce4f81e6326", "https://reddit.com/user/*/posts/*/?efe2d409a42=f9ce4f81e6326"],
       "css": ["third_party/bootstrap.min.css"],
       "js": ["third_party/jquery-3.2.1.slim.min.js", "third_party/vue.js", "third_party/bootstrap.min.js", "content_scripts/shared/utils.js", "content_scripts/shared/reddit_objects.js", "content_scripts/shared/shared_ui.js", "content_scripts/comment_overwrite_delete.js"],
       "run_at": "document_idle"
