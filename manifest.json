@@ -3,7 +3,7 @@
 
   "name": "Nuke Reddit History",
   "description": "To overwrite & delete all your comments on reddit, click this extension's icon next to your address bar.",
-  "version": "1.1",
+  "version": "1.2",
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",

@@ -4,6 +4,12 @@ var DELETE_BUTTON_TEXT = 'delete';
 var PAGE_TYPE_COMMENTS = 'comments';
 var PAGE_TYPE_POSTS = 'posts'
 
+function findAnchorWithTextInside(text) {
+    var self = this;
+    var allAnchors = self.htmlElement.getElementsByTagName('a');
+    return getFirstElementWithTextInside(text, allAnchors);
+}
+
 /**
  * @param: htmlElement - html element of the comment
  * @param: articleId - unique ID of the comment.
@@ -16,11 +22,7 @@ function Comment(htmlElement) {
   this.isEdited = false;
 }
 
-Comment.prototype.findAnchorWithTextInside = function(text) {
-    var self = this;
-    var allAnchors = self.htmlElement.getElementsByTagName('a');
-    return getFirstElementWithTextInside(text, allAnchors);
-};
+Comment.prototype.findAnchorWithTextInside = findAnchorWithTextInside;
 
 Comment.prototype.deleteComment = function () {
     var self = this;
@@ -46,7 +48,18 @@ Comment.prototype.overWrite = function () {
 };
 
 function Post(htmlElement){
+    this.htmlElement = htmlElement;
     this.deleteButton = this.findAnchorWithTextInside(DELETE_BUTTON_TEXT);
+}
+
+Post.prototype.findAnchorWithTextInside = findAnchorWithTextInside;
+
+Post.prototype.deletePost = function() {
+    var self = this;
+    self.deleteButton.click();
+        var deleteConfirmation = self.findAnchorWithTextInside("yes");
+        if (deleteConfirmation) deleteConfirmation.click();
+        else console.log('No Delete comfirmation for post ', self.htmlElement);
 }
 
 /**
@@ -74,9 +87,11 @@ function UserPage() {
 UserPage.prototype.init = function () {
     if (document.URL.includes('posts')) {
         this.scanPosts();
+        this.deletePosts();
     }
     else if (document.URL.includes('comments')) {
         this.initVueApp();
+        this.overwriteAndDeleteComments();
     }
 }
 
@@ -140,7 +155,6 @@ UserPage.prototype.calculateProgress = function () {
 };
 
 UserPage.prototype.scanComments = function () {
-    // var commentHtmlElements = [].slice.call(document.getElementsByClassName('CommentListing__comment'));
     var commentHtmlElements = [].slice.call(document.getElementsByTagName('article'));
     var self = this;
     commentHtmlElements.forEach(function (commentHtmlElement) {
@@ -150,12 +164,25 @@ UserPage.prototype.scanComments = function () {
 };
 
 UserPage.prototype.scanPosts = function () {
-    var postHtmlElements = document.getElementsByClassName('Post__info');
-    postHtmlElements.forEach(function (postHtmlElement) {
-        console.log('--------\n\n');
-        
-        console.log(postHtmlElement);
-    });
+    var self = this;
+    var postElements = [].slice.call(document.getElementsByClassName('Post__info'));
+    postElements.forEach(function (postElement) { self.posts.push(new Post(postElement)) });
+
+}
+
+UserPage.prototype.deletePosts = function () {
+    var self = this;
+    var deleteIndex = 0;
+
+    function deletePostsWithDelay() {
+        setTimeout(function () {
+            self.posts[deleteIndex].deletePost();
+            deleteIndex++;
+            if (deleteIndex < self.posts.length) deletePostsWithDelay();
+            else self.addToActionsLog('posts deletion is now complete');
+        }, 1500);
+    }
+    deletePostsWithDelay();
 }
 
 UserPage.prototype.overWriteAndDeleteComments = function () {

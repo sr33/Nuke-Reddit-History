@@ -1,4 +1,4 @@
-alert('NRH IS Loaded');
+console.log('***** NUKE REDDIT HISTORY *****');
 
 var userPage = new UserPage();
 
