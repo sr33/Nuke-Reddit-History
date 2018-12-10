@@ -1,7 +1,8 @@
-console.log('***** NUKE REDDIT HISTORY *****');
+
+console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\nN U K E + R E D D I T + H I S T O R Y\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
 var userPage = new UserPage();
 
 // Check User Profile Compatibility before init
 if (userPage.isUserProfileCompatible) userPage.init();
-else alert('This format of user profile page is incompatible with Nuke Reddit History.\n Please refer to the easy 2 step instruction on the extension description to switch to a compatible format. Thank you and Sorry for the inconvenience.')
+else alert('This format of user profile page is incompatible with Nuke Reddit History.\nPlease goto https://www.reddit.com/profile-beta-confirmation to get a newer reddit profile')

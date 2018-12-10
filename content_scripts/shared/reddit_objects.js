@@ -68,6 +68,8 @@ Post.prototype.deletePost = function() {
  *  @param: nextButton: htmlElement - next button element to go to next page
  */
 function UserPage() {
+    // the sidebar in "older" beta profiles has a class `ProfileTemplate__sidebar`
+    // this extension is only compatible with those "older" beta profiles
     this.isUserProfileCompatible = document.getElementsByClassName("ProfileTemplate__sidebar")[0];
     this.comments = [];
     this.posts = [];
@@ -86,8 +88,7 @@ function UserPage() {
 
 UserPage.prototype.init = function () {
     if (document.URL.includes('posts')) {
-        this.scanPosts();
-        this.deletePosts();
+        this.scanAndDeletePosts();
     }
     else if (document.URL.includes('comments')) {
         this.initVueApp();
@@ -123,21 +124,23 @@ UserPage.prototype.overwriteAndDeleteComments = function () {
     else {
         userPage.addToActionsLog("No Comments Found at " + (new Date()).toString());
         userPage.addToActionsLog("Current Sort set at: " + getParameterByName('sort'));
+        userPage.cycleSortParams("Nuke Reddit History tried it's best to overwrite & delete all comments on your profile.\n\n\n" +
+        "Nuke Reddit History cannot find any more comments on your profile. \n\nIf you think this was done in error, please use the \n \"Issues? Submit Feedback\" button\n to report errors");
+    }
+}
 
-        if (userPage.sort === undefined || userPage.sort === '' || userPage.sort === null){
-            window.location.href = window.location.href + "&sort=hot";
-        }
-        else if (userPage.sort === "hot") {
-            window.location.href = replaceParameter('sort', 'top')
-        }
-        else if (userPage.sort === "top") {
-            window.location.href = replaceParameter('sort', 'controversial');
-        }
-        else {
-            alert("Nuke Reddit History Extension tried it's best to overwrite & delete all comments on your profile.\n\n\n" +
-                "Nuke Reddit History cannot find any more comments on your profile. \n\nIf you think this was done in error, please use the \n \"Issues? Submit Feedback\" button\n to report errors");
-        }
-
+UserPage.prototype.cycleSortParams = function (msg) {
+    if (userPage.sort === undefined || userPage.sort === '' || userPage.sort === null || userPage.sort === 'new') {
+        window.location.href = window.location.href + "&sort=hot";
+    }
+    else if (userPage.sort === "hot") {
+        window.location.href = replaceParameter('sort', 'top')
+    }
+    else if (userPage.sort === "top") {
+        window.location.href = replaceParameter('sort', 'controversial');
+    }
+    else {
+        alert(msg);
     }
 }
 
@@ -163,6 +166,19 @@ UserPage.prototype.scanComments = function () {
     });
 };
 
+UserPage.prototype.scanAndDeletePosts = function () {
+    var self = this;
+    this.scanPosts();
+    this.addToActionsLog('number of posts found -> ', this.posts.length);
+    if (this.posts.length > 0) {
+        self.deletePosts();
+    }
+    else {
+        self.cycleSortParams("Nuke Reddit History tried it's best to delete all posts on your profile.\n\n\n" +
+        "Nuke Reddit History cannot find any more posts on your profile. \n\nIf you think this was done in error, please post feedback on /r/NukeRedditHistory")
+    }
+}
+
 UserPage.prototype.scanPosts = function () {
     var self = this;
     var postElements = [].slice.call(document.getElementsByClassName('Post__info'));
@@ -180,6 +196,7 @@ UserPage.prototype.deletePosts = function () {
             deleteIndex++;
             if (deleteIndex < self.posts.length) deletePostsWithDelay();
             else self.addToActionsLog('posts deletion is now complete');
+            location.reload();
         }, 1500);
     }
     deletePostsWithDelay();
