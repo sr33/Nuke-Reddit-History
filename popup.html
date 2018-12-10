@@ -3,44 +3,42 @@
 
 <head>
     <style>
-        a {
-            appearance: button; /* CSS3 */
-            -webkit-appearance: button; /* Safari and Chrome */
-            -moz-appearance: button; /* Firefox */
-            cursor: default;
-            padding: 5px;
-            text-align: center;
+        .button {
+            background-color: #fa8231;  
+            border-radius: 5px;
+            color: white;
+            padding: .5em;
             text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .button:focus,
+        .button:hover {
+            background-color: #fd9644;
+            color: White;
+        }
+        
+        body {
+            min-width: 300px;
+            min-height: 125px;
+            color: #4b6584;
+            background-color:#d1d8e0"
         }
     </style>
 </head>
 
-<body style="min-width: 450px; min-height: 100px; background-color: #ecf0f1">
+<body>
 
-    <h1 style="color: #cd7930; text-align: center">
+    <h1 style="color: #fa8231; text-align: center">
         Nuke Reddit History
     </h1>
-    <hr>
 
-    <p style="margin-bottom: 2px;">
-        <ul>
-
-            <li>
-                Are you logged in the reddit account that has comments you want to overwrite & delete?
-            </li>
-
-            <li>
-                <strong>
-                    Please be aware that this extension does not backup or store any data.
-                </strong>
-            </li>
-        </ul>
-    </p>
-
-    <p style="text-align: center">
-        <a href="https://reddit.com/u/me/comments/?efe2d409a42=f9ce4f81e6326" target="_blank">Overwrite & Delete All My Comments</a>
-    </p>
-
+    
+    <a class="button" href="https://old.reddit.com/u/me/comments/?efe2d409a42=f9ce4f81e6326" target="_blank">Overwrite & Delete All My Comments</a>
+    <br>
+    <a class="button" href="https://old.reddit.com/u/me/posts/?efe2d409a42=f9ce4f81e6326" target="_blank">Delete All My Posts</a>
+    
 </body>
 
 </html>

@@ -1,6 +1,15 @@
 var EDIT_BUTTON_TEXT = "edit";
 var DELETE_BUTTON_TEXT = 'delete';
 
+var PAGE_TYPE_COMMENTS = 'comments';
+var PAGE_TYPE_POSTS = 'posts'
+
+function findAnchorWithTextInside(text) {
+    var self = this;
+    var allAnchors = self.htmlElement.getElementsByTagName('a');
+    return getFirstElementWithTextInside(text, allAnchors);
+}
+
 /**
  * @param: htmlElement - html element of the comment
  * @param: articleId - unique ID of the comment.
@@ -13,11 +22,7 @@ function Comment(htmlElement) {
   this.isEdited = false;
 }
 
-Comment.prototype.findAnchorWithTextInside = function(text) {
-    var self = this;
-    var allAnchors = self.htmlElement.getElementsByTagName('a');
-    return getFirstElementWithTextInside(text, allAnchors);
-};
+Comment.prototype.findAnchorWithTextInside = findAnchorWithTextInside;
 
 Comment.prototype.deleteComment = function () {
     var self = this;
@@ -42,8 +47,34 @@ Comment.prototype.overWrite = function () {
     this.isEdited = true;
 };
 
+function Post(htmlElement){
+    this.htmlElement = htmlElement;
+    this.deleteButton = this.findAnchorWithTextInside(DELETE_BUTTON_TEXT);
+}
+
+Post.prototype.findAnchorWithTextInside = findAnchorWithTextInside;
+
+Post.prototype.deletePost = function() {
+    var self = this;
+    self.deleteButton.click();
+        var deleteConfirmation = self.findAnchorWithTextInside("yes");
+        if (deleteConfirmation) deleteConfirmation.click();
+        else console.log('No Delete comfirmation for post ', self.htmlElement);
+}
+
+/**
+ *  @param: isUserProfileCompatible: boolean - is user profile is compatible with this extension?
+ *  @param: pageType: string - this is either a comments page or a posts page
+ *  @param: nextButton: htmlElement - next button element to go to next page
+ */
 function UserPage() {
+    // the sidebar in "older" beta profiles has a class `ProfileTemplate__sidebar`
+    // this extension is only compatible with those "older" beta profiles
+    this.isUserProfileCompatible = document.getElementsByClassName("ProfileTemplate__sidebar")[0];
     this.comments = [];
+    this.posts = [];
+
+    this.pageType = document.URL.includes('posts')? PAGE_TYPE_POSTS: PAGE_TYPE_COMMENTS;
     this.nextButton = getFirstElementWithTextInside("next", document.getElementsByClassName('ListingPagination__navButton'));
     this.requestsStartTime = undefined;
     this.requestsEndTime = undefined;
@@ -51,8 +82,66 @@ function UserPage() {
     this.numberOfEditedComments = 0;
     this.numberOfDeletedComments = 0;
     this.progress = "0%";
-    this.actionsLog = "App Entry: " + (new Date()).toString();
+    this.actionsLog = "App Entry: " + (new Date()).toString() + '\n';
     this.sort = getParameterByName('sort');
+}
+
+UserPage.prototype.init = function () {
+    if (document.URL.includes('posts')) {
+        this.scanAndDeletePosts();
+    }
+    else if (document.URL.includes('comments')) {
+        this.initVueApp();
+        this.overwriteAndDeleteComments();
+    }
+}
+
+UserPage.prototype.initVueApp = function () {
+    var self = this;
+    this.addHtmlSticky("template.html");
+
+    var statsApp = new Vue({
+        el: '#statsDiv',
+        data: {
+            userPage: self
+        },
+        methods: {
+            onFeedbackClick: function () {
+                window.open("https://www.reddit.com/r/nukereddithistory/submit?title=Error%20Help:%20Log%20Provided&text=" + encodeURI(self.actionsLog), "_blank")
+            }
+        }
+    });
+}
+
+UserPage.prototype.overwriteAndDeleteComments = function () {
+    var userPage = this;
+    userPage.scanComments();
+    userPage.addToActionsLog("number of comments found- " + userPage.comments.length + " at- " + (new Date()).toString());
+    if (userPage.comments.length > 0) {
+        userPage.addToActionsLog("Started Editing Comments");
+        userPage.overWriteAndDeleteComments();
+    }
+    else {
+        userPage.addToActionsLog("No Comments Found at " + (new Date()).toString());
+        userPage.addToActionsLog("Current Sort set at: " + getParameterByName('sort'));
+        userPage.cycleSortParams("Nuke Reddit History tried it's best to overwrite & delete all comments on your profile.\n\n\n" +
+        "Nuke Reddit History cannot find any more comments on your profile. \n\nIf you think this was done in error, please use the \n \"Issues? Submit Feedback\" button\n to report errors");
+    }
+}
+
+UserPage.prototype.cycleSortParams = function (msg) {
+    if (userPage.sort === undefined || userPage.sort === '' || userPage.sort === null || userPage.sort === 'new') {
+        window.location.href = window.location.href + "&sort=hot";
+    }
+    else if (userPage.sort === "hot") {
+        window.location.href = replaceParameter('sort', 'top')
+    }
+    else if (userPage.sort === "top") {
+        window.location.href = replaceParameter('sort', 'controversial');
+    }
+    else {
+        alert(msg);
+    }
 }
 
 UserPage.prototype.addToActionsLog = function (text) {
@@ -69,7 +158,6 @@ UserPage.prototype.calculateProgress = function () {
 };
 
 UserPage.prototype.scanComments = function () {
-    // var commentHtmlElements = [].slice.call(document.getElementsByClassName('CommentListing__comment'));
     var commentHtmlElements = [].slice.call(document.getElementsByTagName('article'));
     var self = this;
     commentHtmlElements.forEach(function (commentHtmlElement) {
@@ -77,6 +165,42 @@ UserPage.prototype.scanComments = function () {
         self.comments.push(comment);
     });
 };
+
+UserPage.prototype.scanAndDeletePosts = function () {
+    var self = this;
+    this.scanPosts();
+    this.addToActionsLog('number of posts found -> ', this.posts.length);
+    if (this.posts.length > 0) {
+        self.deletePosts();
+    }
+    else {
+        self.cycleSortParams("Nuke Reddit History tried it's best to delete all posts on your profile.\n\n\n" +
+        "Nuke Reddit History cannot find any more posts on your profile. \n\nIf you think this was done in error, please post feedback on /r/NukeRedditHistory")
+    }
+}
+
+UserPage.prototype.scanPosts = function () {
+    var self = this;
+    var postElements = [].slice.call(document.getElementsByClassName('Post__info'));
+    postElements.forEach(function (postElement) { self.posts.push(new Post(postElement)) });
+
+}
+
+UserPage.prototype.deletePosts = function () {
+    var self = this;
+    var deleteIndex = 0;
+
+    function deletePostsWithDelay() {
+        setTimeout(function () {
+            self.posts[deleteIndex].deletePost();
+            deleteIndex++;
+            if (deleteIndex < self.posts.length) deletePostsWithDelay();
+            else self.addToActionsLog('posts deletion is now complete');
+            location.reload();
+        }, 1500);
+    }
+    deletePostsWithDelay();
+}
 
 UserPage.prototype.overWriteAndDeleteComments = function () {
     /**
