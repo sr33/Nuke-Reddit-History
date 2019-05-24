@@ -68,9 +68,6 @@ Post.prototype.deletePost = function() {
  *  @param: nextButton: htmlElement - next button element to go to next page
  */
 function UserPage() {
-    // the sidebar in "older" beta profiles has a class `ProfileTemplate__sidebar`
-    // this extension is only compatible with those "older" beta profiles
-    this.isUserProfileCompatible = document.getElementsByClassName("ProfileTemplate__sidebar")[0];
     this.comments = [];
     this.posts = [];
 
@@ -158,7 +155,8 @@ UserPage.prototype.calculateProgress = function () {
 };
 
 UserPage.prototype.scanComments = function () {
-    var commentHtmlElements = [].slice.call(document.getElementsByTagName('article'));
+    var commentHtmlElements = [].slice.call(document.querySelectorAll("[data-type='comment']")
+    );
     var self = this;
     commentHtmlElements.forEach(function (commentHtmlElement) {
         var comment = new Comment(commentHtmlElement);
@@ -282,7 +280,7 @@ UserPage.prototype.addHtmlSticky = function (pathToHtmlTemplate) {
     // You must specify a threshold with at least one of top, right, bottom, or left for sticky for it to work - MDN
     inject.style.top = "0";
     inject.innerHTML = xmlHttp.responseText;
-    var profileSideBar = document.getElementsByClassName("ProfileTemplate__sidebar")[0];
+    var profileSideBar = document.getElementsByClassName("side")[0];
     while (profileSideBar.firstChild) {
         profileSideBar.removeChild(profileSideBar.firstChild);
     }
