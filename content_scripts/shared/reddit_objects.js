@@ -40,8 +40,8 @@ Comment.prototype.deleteComment = function () {
 
 Comment.prototype.overWrite = function () {
     this.editButton.click();
-    var editTextBox = this.htmlElement.getElementsByClassName('MarkdownForm__text')[0];
-    var saveButton = this.htmlElement.getElementsByClassName('MarkdownForm__submit')[0];
+    var editTextBox = this.htmlElement.getElementsByTagName('textarea')[0];
+    var saveButton = this.htmlElement.getElementsByClassName('save')[0];
     editTextBox.value = generateRandomPhrase();
     saveButton.click();
     this.isEdited = true;
