@@ -1,2 +1,5 @@
 # Nuke-Reddit-History
-Chrome Extension to overwrite and delete reddit history.
+
+Archived 1.x versions of the extension.
+
+Nuke Reddit History has moved to [this new repository](https://github.com/sr33/ares) for all versions 2.X
